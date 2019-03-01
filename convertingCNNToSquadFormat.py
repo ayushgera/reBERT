@@ -17,17 +17,27 @@ def getStoryPreProcessedContent(storyContent):
 
     return content
 
+# Returns un-preprocessed story
+def getStory(story):
+    content = ""
+    for line in story:
+        content = content + line.replace("\n", "\\n")
+
+    return content
+
+
 # Function determines if at all an answer is present
 def isAnswerPresent(answerArray):
-    for i in len(answerArray):
+    for i in range(0,len(answerArray)-1):
         if answerArray[i].lower().strip() != "none":
             return answerArray[i]
 
     return False
 
 # Function returns the answer of the question
-def getAnswerGivenCharRange(ansCharRange):
-
+def getAnswerGivenCharRange(ansCharRange,story):
+    rangeSplit = ansCharRange.split(":")
+    return story[int(rangeSplit[0]):int(rangeSplit[1])]
 
 # Initializing
 dataFrameDataSet = pd.read_csv(filePathDataset)
@@ -51,40 +61,37 @@ storiesId = {}
 # Construction of JSON data
 
 
-for i in len(dataFrameDataSet):
+for i in range(0,len(dataFrameDataSet)-1):
     # Skip if no answer present
     answerArray = (dataFrameDataSet["answer_char_ranges"][i]).split("|")
     answerPresence = isAnswerPresent(answerArray)
 
     if not answerPresence:
-        # No answer present
+        # No answer present - don't add question/para to dataset
         continue
 
-    # Get answer
-    answer = getAnswerGivenCharRange(answerPresence)
-
     storyId = dataFrameDataSet["story_id"][i]
+    storiesPath = os.path.abspath(filePathStories + dataFrameDataSet["story_id"][i])
+    if not os.path.isfile(storiesPath):
+        raise TypeError(storiesPath + " is not present")
 
+    story = open(storiesPath)
+    # Get answer
+    answer = getAnswerGivenCharRange(answerPresence,getStory(story))
+
+    print(answer)
 
     if(storiesId[storyId]):
         # paragraph already present, question has been added
+        print("Story already present")
     else:
         # new paragraph added
         storiesId[storyId] = True
         dataElement["title"] = "someDummyTitle"
 
         # Stories Path
-        storiesPath = os.path.abspath(filePathStories + dataFrameDataSet["story_id"][0])
-        if not os.path.isfile(storiesPath):
-            raise TypeError(storiesPath + " is not present")
-
-        story = open(storiesPath, encoding="utf-8")
-
-
 
         dataElement["context"] = getStoryPreProcessedContent(story)
-
-print(dataFrameDataSet["story_id"][0])
 
 
 answerElement["answer_start"] = 654
