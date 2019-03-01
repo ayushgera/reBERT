@@ -39,6 +39,11 @@ def getAnswerGivenCharRange(ansCharRange,story):
     rangeSplit = ansCharRange.split(":")
     return story[int(rangeSplit[0]):int(rangeSplit[1])]
 
+def getStartAnswerCharIndex(ansCharRange):
+    rangeSplit = ansCharRange.split(":")
+    return int(rangeSplit[0])
+
+
 # Initializing
 dataFrameDataSet = pd.read_csv(filePathDataset)
 
@@ -55,11 +60,8 @@ paragraphElement = {}
 dataElement["qas"] = [] # Array of objects
 
 storiesId = {}
-# skip question if no answer
-
 
 # Construction of JSON data
-
 
 for i in range(0,len(dataFrameDataSet)-1):
     # Skip if no answer present
@@ -70,52 +72,49 @@ for i in range(0,len(dataFrameDataSet)-1):
         # No answer present - don't add question/para to dataset
         continue
 
-    storyId = dataFrameDataSet["story_id"][i]
-    storiesPath = os.path.abspath(filePathStories + dataFrameDataSet["story_id"][i])
+    id = dataFrameDataSet["story_id"][i]
+    storiesPath = os.path.abspath(filePathStories + id)
     if not os.path.isfile(storiesPath):
         raise TypeError(storiesPath + " is not present")
 
-    story = open(storiesPath)
+    story = open(storiesPath, encoding="utf-8")
     # Get answer
     answer = getAnswerGivenCharRange(answerPresence,getStory(story))
 
-    print(answer)
-
-    if(storiesId[storyId]):
+    if id in storiesId:
         # paragraph already present, question has been added
         print("Story already present")
     else:
         # new paragraph added
-        storiesId[storyId] = True
+        storiesId[id] = True
         dataElement["title"] = "someDummyTitle"
+        # paragraph
+        dataElement["context"] = getStoryPreProcessedContent(getStory(story))
 
-        # Stories Path
+        # answer
+        answerElement["answer_start"] = getStartAnswerCharIndex(answerPresence)
+        answerElement["text"] = answer
 
-        dataElement["context"] = getStoryPreProcessedContent(story)
+        # question
+        dataElement["question"] = dataFrameDataSet["answer"][i]
+        dataElement["id"] = id
 
+    # Building up of objects
+    dataElement["answers"].append(answerElement)
 
-answerElement["answer_start"] = 654
-answerElement["text"] = "some answer"
+    qasElement["answers"] = dataElement["answers"]
+    qasElement["question"] = dataElement["question"]
+    qasElement["id"] = dataElement["id"]
+    dataElement["qas"].append(qasElement)
 
+    paragraphElement["context"] = dataElement["context"]
+    paragraphElement["qas"] = dataElement["qas"]
+    paragraphElement["storyId"] = id
+    dataElement["paragraphs"].append(paragraphElement)
 
-dataElement["question"] = "To whom did the Virgin Mary allegedly appear in 1858 in Lourdes France?"
-dataElement["id"] = "SomeUniqueId"
-
-# Building up of objects
-dataElement["answers"].append(answerElement)
-
-qasElement["answers"] = dataElement["answers"]
-qasElement["question"] = dataElement["question"]
-qasElement["id"] = dataElement["id"]
-dataElement["qas"].append(qasElement)
-
-paragraphElement["context"] = dataElement["context"]
-paragraphElement["qas"] = dataElement["qas"]
-dataElement["paragraphs"].append(paragraphElement)
-
-dataObject["title"] = dataElement["title"]
-dataObject["paragraphs"] = dataElement["paragraphs"]
-data["data"].append(dataObject)
+    dataObject["title"] = dataElement["title"]
+    dataObject["paragraphs"] = dataElement["paragraphs"]
+    data["data"].append(dataObject)
 
 squadWrapper["data"] = data["data"]
 squadWrapper["version"] = "1.1"
