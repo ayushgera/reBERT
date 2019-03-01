@@ -3,6 +3,7 @@ import csv
 import os as os
 import pandas as pd
 import re as regex
+import json
 
 filePathDataset = os.path.abspath("../../Masters Projects/Dataset/newsqa-data-v1/newsqa-data-v1Copy.csv")
 filePathStories = os.path.abspath("../../Masters Projects/Dataset/cnn_stories/cnn_stories")
@@ -11,20 +12,19 @@ REPLACE_WITH_NO_SPACE = \
 
 # Function does first-level data cleaning
 def getStoryPreProcessedContent(storyContent):
-    content = ""
-    for line in storyContent:
-        content = content + (regex.sub(REPLACE_WITH_NO_SPACE, "", line).lower()).strip()
-
+    content = regex.sub(REPLACE_WITH_NO_SPACE, "", storyContent).lower()
     return content
+
+# Returns un-preprocessed escaped story
+def getEscapedStory(story):
+    return story.replace("\n", "\\n")
 
 # Returns un-preprocessed story
 def getStory(story):
     content = ""
     for line in story:
-        content = content + line.replace("\n", "\\n")
-
+        content = content + line
     return content
-
 
 # Function determines if at all an answer is present
 def isAnswerPresent(answerArray):
@@ -78,8 +78,10 @@ for i in range(0,len(dataFrameDataSet)-1):
         raise TypeError(storiesPath + " is not present")
 
     story = open(storiesPath, encoding="utf-8")
+    unprocessedStory = getStory(story)
+
     # Get answer
-    answer = getAnswerGivenCharRange(answerPresence,getStory(story))
+    answer = getAnswerGivenCharRange(answerPresence,getEscapedStory(unprocessedStory))
 
     if id in storiesId:
         # paragraph already present, question has been added
@@ -89,14 +91,14 @@ for i in range(0,len(dataFrameDataSet)-1):
         storiesId[id] = True
         dataElement["title"] = "someDummyTitle"
         # paragraph
-        dataElement["context"] = getStoryPreProcessedContent(getStory(story))
+        dataElement["context"] = getStoryPreProcessedContent(unprocessedStory)
 
         # answer
         answerElement["answer_start"] = getStartAnswerCharIndex(answerPresence)
-        answerElement["text"] = answer
+        answerElement["text"] = answer.strip()
 
         # question
-        dataElement["question"] = dataFrameDataSet["answer"][i]
+        dataElement["question"] = dataFrameDataSet["question"][i]
         dataElement["id"] = id
 
     # Building up of objects
@@ -118,4 +120,9 @@ for i in range(0,len(dataFrameDataSet)-1):
 
 squadWrapper["data"] = data["data"]
 squadWrapper["version"] = "1.1"
+
+
+# Create new JSON File
+with open('newsQaJSONSquadFormat.json', 'w') as f:
+  json.dump(squadWrapper, f, ensure_ascii=False)
 
