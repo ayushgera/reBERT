@@ -28,7 +28,7 @@ def getStory(story):
 
 # Function determines if at all an answer is present
 def isAnswerPresent(answerArray):
-    for i in range(0,len(answerArray)-1):
+    for i in range(0,len(answerArray)):
         if answerArray[i].lower().strip() != "none":
             return answerArray[i]
 
@@ -63,7 +63,7 @@ storiesId = {}
 
 # Construction of JSON data
 
-for i in range(0,len(dataFrameDataSet)-1):
+for i in range(0,len(dataFrameDataSet)):
     # Skip if no answer present
     answerArray = (dataFrameDataSet["answer_char_ranges"][i]).split("|")
     answerPresence = isAnswerPresent(answerArray)
@@ -87,6 +87,13 @@ for i in range(0,len(dataFrameDataSet)-1):
         # paragraph already present, question has been added
         print("Story already present")
     else:
+        # Initialization
+        dataElement = {}
+        dataObject = {}
+        paragraphElement = {}
+        qasElement = {}
+        answerElement = {}
+
         # new paragraph added
         storiesId[id] = True
         dataElement["title"] = "someDummyTitle"
@@ -102,17 +109,17 @@ for i in range(0,len(dataFrameDataSet)-1):
         dataElement["id"] = id
 
     # Building up of objects
-    dataElement["answers"].append(answerElement)
+    dataElement["answers"] = answerElement
 
     qasElement["answers"] = dataElement["answers"]
     qasElement["question"] = dataElement["question"]
     qasElement["id"] = dataElement["id"]
-    dataElement["qas"].append(qasElement)
+    dataElement["qas"] = qasElement
 
     paragraphElement["context"] = dataElement["context"]
     paragraphElement["qas"] = dataElement["qas"]
     paragraphElement["storyId"] = id
-    dataElement["paragraphs"].append(paragraphElement)
+    dataElement["paragraphs"] = paragraphElement
 
     dataObject["title"] = dataElement["title"]
     dataObject["paragraphs"] = dataElement["paragraphs"]
