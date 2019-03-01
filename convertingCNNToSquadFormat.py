@@ -34,6 +34,18 @@ def isAnswerPresent(answerArray):
 
     return False
 
+def getAnswersAsText(answerArray, story):
+    answersList=[]
+    for i in range(0,len(answerArray)):
+        if answerArray[i].lower().strip() != "none":
+            answerElement= {}
+            rangeSplit = answerArray[i].split(":")
+            answer= story[int(rangeSplit[0]):int(rangeSplit[1])]
+            answerElement["answer_start"] = int(rangeSplit[0])
+            answerElement["text"] = answer.strip()
+            answersList.append(answerElement)
+    return answersList
+
 # Function returns the answer of the question
 def getAnswerGivenCharRange(ansCharRange,story):
     rangeSplit = ansCharRange.split(":")
@@ -101,16 +113,13 @@ for i in range(0,len(dataFrameDataSet)):
         dataElement["context"] = getStoryPreProcessedContent(unprocessedStory)
 
         # answer
-        answerElement["answer_start"] = getStartAnswerCharIndex(answerPresence)
-        answerElement["text"] = answer.strip()
+        dataElement["answers"] = getAnswersAsText(answerArray, getEscapedStory(unprocessedStory))
 
         # question
         dataElement["question"] = dataFrameDataSet["question"][i]
         dataElement["id"] = id
 
     # Building up of objects
-    dataElement["answers"] = answerElement
-
     qasElement["answers"] = dataElement["answers"]
     qasElement["question"] = dataElement["question"]
     qasElement["id"] = dataElement["id"]
