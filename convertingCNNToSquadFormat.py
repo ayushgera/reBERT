@@ -5,10 +5,10 @@ import pandas as pd
 import re as regex
 import json
 
-filePathDataset = os.path.abspath("../../Masters Projects/Dataset/newsqa-data-v1/newsqa-data-v1Copy.csv")
-filePathStories = os.path.abspath("../../Masters Projects/Dataset/cnn_stories/cnn_stories")
+filePathDataset = os.path.abspath("./data/newsqa-data-v1/newsqa-data-v1.csv")
+filePathStories = os.path.abspath("./data/")
 REPLACE_WITH_NO_SPACE = \
-    regex.compile("(\()|(\,)|(\")|(\))|(\–)|(\.)|(\;)|(\!)|(\-)|(<br />)|@highlight|(cnn)|(\:)|(\“)|(\’)|(\‘)|(\”)|(\')")
+    regex.compile("(\()|(\,)|(\")|(\))|(\–)|(\;)|(\!)|(\-)|(<br />)|@highlight|(cnn)|(\:)|(\“)|(\’)|(\‘)|(\”)|(\')|(\\n)")
 
 # Function does first-level data cleaning
 def getStoryPreProcessedContent(storyContent):
@@ -40,10 +40,12 @@ def getAnswersAsText(answerArray, story):
         if answerArray[i].lower().strip() != "none":
             answerElement= {}
             rangeSplit = answerArray[i].split(":")
-            answer= story[int(rangeSplit[0]):int(rangeSplit[1])]
-            answerElement["answer_start"] = int(rangeSplit[0])
-            answerElement["text"] = answer.strip()
-            answersList.append(answerElement)
+            # remove below filter once multi-range line answers are handled
+            if rangeSplit[0].find(",") ==-1 and rangeSplit[1].find(",") ==-1:
+                answer= story[int(rangeSplit[0]):int(rangeSplit[1])]
+                answerElement["answer_start"] = int(rangeSplit[0])
+                answerElement["text"] = answer.strip()
+                answersList.append(answerElement)
     return answersList
 
 # Function returns the answer of the question
@@ -55,9 +57,17 @@ def getStartAnswerCharIndex(ansCharRange):
     rangeSplit = ansCharRange.split(":")
     return int(rangeSplit[0])
 
+def createNewQuestion(question, answerArray, unprocessedStory):
+    # Building up of objects
+    qaElement= {}
+    qaElement["answers"] = getAnswersAsText(answerArray, getEscapedStory(unprocessedStory))
+    qaElement["question"] = question
+    qaElement["id"] = id
+    return qaElement
 
 # Initializing
 dataFrameDataSet = pd.read_csv(filePathDataset)
+dataFrameDataSet.dropna(how="all", inplace=True) 
 
 squadWrapper = {}
 dataElement = {}
@@ -85,54 +95,42 @@ for i in range(0,len(dataFrameDataSet)):
         continue
 
     id = dataFrameDataSet["story_id"][i]
-    storiesPath = os.path.abspath(filePathStories + id)
+    storiesPath = os.path.abspath("./data/" + id)
     if not os.path.isfile(storiesPath):
         raise TypeError(storiesPath + " is not present")
 
     story = open(storiesPath, encoding="utf-8")
     unprocessedStory = getStory(story)
 
-    # Get answer
-    answer = getAnswerGivenCharRange(answerPresence,getEscapedStory(unprocessedStory))
-
     if id in storiesId:
         # paragraph already present, question has been added
-        print("Story already present")
+        # print("Story already present")
+        for storyElement in data["data"]:
+            if storyElement["title"] == id:
+                print("Adding for id: ",storyElement["title"])
+                currentQuestions= storyElement["paragraphs"]["qas"]
+                currentQuestions.append(
+                    createNewQuestion(
+                        dataFrameDataSet["question"][i], 
+                        answerArray, 
+                        unprocessedStory))
+                storyElement["paragraphs"]["qas"]= currentQuestions
     else:
-        # Initialization
-        dataElement = {}
-        dataObject = {}
-        paragraphElement = {}
-        qasElement = {}
-        answerElement = {}
-
         # new paragraph added
         storiesId[id] = True
-        dataElement["title"] = "someDummyTitle"
-        # paragraph
-        dataElement["context"] = getStoryPreProcessedContent(unprocessedStory)
+        
+        firstQuestion= []
+        firstQuestion.append(createNewQuestion(dataFrameDataSet["question"][i], answerArray, unprocessedStory))
+        
+        paragraphElement = {}
+        paragraphElement["context"] = getStoryPreProcessedContent(unprocessedStory)
+        paragraphElement["qas"] = firstQuestion
+        paragraphElement["storyId"] = id
 
-        # answer
-        dataElement["answers"] = getAnswersAsText(answerArray, getEscapedStory(unprocessedStory))
-
-        # question
-        dataElement["question"] = dataFrameDataSet["question"][i]
-        dataElement["id"] = id
-
-    # Building up of objects
-    qasElement["answers"] = dataElement["answers"]
-    qasElement["question"] = dataElement["question"]
-    qasElement["id"] = dataElement["id"]
-    dataElement["qas"] = qasElement
-
-    paragraphElement["context"] = dataElement["context"]
-    paragraphElement["qas"] = dataElement["qas"]
-    paragraphElement["storyId"] = id
-    dataElement["paragraphs"] = paragraphElement
-
-    dataObject["title"] = dataElement["title"]
-    dataObject["paragraphs"] = dataElement["paragraphs"]
-    data["data"].append(dataObject)
+        dataObject = {}
+        dataObject["title"] = id
+        dataObject["paragraphs"] = paragraphElement
+        data["data"].append(dataObject)
 
 squadWrapper["data"] = data["data"]
 squadWrapper["version"] = "1.1"
