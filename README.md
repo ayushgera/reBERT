@@ -1,4 +1,4 @@
-# pyTorch_NN
+# NewsQA Preprocessing
 
 **NewsQA to SQuAD adaptor**:
   - This reads the NewsQA dataset (consisting of dataset with story IDs, and zipped CNN stories)
