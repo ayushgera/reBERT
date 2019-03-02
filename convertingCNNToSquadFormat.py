@@ -70,22 +70,12 @@ dataFrameDataSet = pd.read_csv(filePathDataset)
 dataFrameDataSet.dropna(how="all", inplace=True) 
 
 squadWrapper = {}
-dataElement = {}
 data = dict()
-data["data"] = [] # Array of objects
-dataObject = {}
-dataElement["answers"] = [] # Array of objects
-answerElement = {}
-qasElement = {}
-dataElement["paragraphs"] = [] # Array of objects
-paragraphElement = {}
-dataElement["qas"] = [] # Array of objects
-
+data["data"] = []
 storiesId = {}
 
 # Construction of JSON data
-
-for i in range(0,len(dataFrameDataSet)):
+for i in range(0, len(dataFrameDataSet)):
     # Skip if no answer present
     answerArray = (dataFrameDataSet["answer_char_ranges"][i]).split("|")
     answerPresence = isAnswerPresent(answerArray)
