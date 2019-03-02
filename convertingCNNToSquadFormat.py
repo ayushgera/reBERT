@@ -75,8 +75,7 @@ data["data"] = []
 storiesId = {}
 
 # Construction of JSON data
-#len(dataFrameDataSet)
-for i in range(0, 5000):
+for i in range(0, len(dataFrameDataSet)):
     # Skip if no answer present
     answerArray = (dataFrameDataSet["answer_char_ranges"][i]).split("|")
     answerPresence = isAnswerPresent(answerArray)
