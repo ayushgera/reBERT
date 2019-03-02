@@ -1,0 +1,5 @@
+# ignore input files, since these are too big
+# directory pandas was created for debugging in VS Studio
+
+data/
+pandas/
