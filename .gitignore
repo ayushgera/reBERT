@@ -3,3 +3,7 @@
 
 data/
 pandas/
+output/newsQaJSONSquadFormat_5000.json
+output/newsQaJSONSquadFormat.json
+.DS_Store
+debug/.DS_Store
