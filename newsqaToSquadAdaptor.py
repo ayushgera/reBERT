@@ -9,6 +9,7 @@ filePathDataset = os.path.abspath("./data/newsqa-data-v1/newsqa-data-v1.csv")
 filePathStories = os.path.abspath("./data/")
 REPLACE_WITH_NO_SPACE = \
     regex.compile("(\()|(\,)|(\")|(\))|(\–)|(\;)|(\!)|(\-)|(<br />)|@highlight|(cnn)|(\:)|(\“)|(\’)|(\‘)|(\”)|(\')|(\\n)")
+IS_TRAINING = True
 
 # Function does first-level data cleaning
 def getStoryPreProcessedContent(storyContent):
@@ -34,7 +35,8 @@ def isAnswerPresent(answerArray):
 
     return False
 
-def getAnswersAsText(answerArray, story):
+# TODO: 
+def getAnswersAsText(answerArray, story, IS_TRAINING):
     answersList=[]
     for i in range(0,len(answerArray)):
         if answerArray[i].lower().strip() != "none":
@@ -46,7 +48,7 @@ def getAnswersAsText(answerArray, story):
                 answerElement["answer_start"] = int(rangeSplit[0])
                 answerElement["text"] = answer.strip()
                 answersList.append(answerElement)
-    return answersList
+    return answersList[0:1] if IS_TRAINING else answersList
 
 # Function returns the answer of the question
 def getAnswerGivenCharRange(ansCharRange,story):
@@ -57,10 +59,12 @@ def getStartAnswerCharIndex(ansCharRange):
     rangeSplit = ansCharRange.split(":")
     return int(rangeSplit[0])
 
-def createNewQuestion(question, answerArray, unprocessedStory):
+def createNewQuestion(question, answerArray, unprocessedStory, IS_TRAINING):
     # Building up of objects
     qaElement= {}
-    qaElement["answers"] = getAnswersAsText(answerArray, getEscapedStory(unprocessedStory))
+    qaElement["answers"] = getAnswersAsText(answerArray, getEscapedStory(unprocessedStory), IS_TRAINING)
+    qaElement["is_impossible"] = len(qaElement["answers"])==0
+    qaElement
     qaElement["question"] = question
     qaElement["id"] = id
     return qaElement
@@ -97,29 +101,33 @@ for i in range(0, len(dataFrameDataSet)):
         # print("Story already present")
         for storyElement in data["data"]:
             if storyElement["title"] == id:
-                print("Adding for id: ",storyElement["title"])
-                currentQuestions= storyElement["paragraphs"]["qas"]
+                currentQuestions= storyElement["paragraphs"][0]["qas"]
                 currentQuestions.append(
                     createNewQuestion(
                         dataFrameDataSet["question"][i], 
                         answerArray, 
-                        unprocessedStory))
-                storyElement["paragraphs"]["qas"]= currentQuestions
+                        unprocessedStory, IS_TRAINING))
+                storyElement["paragraphs"][0]["qas"]= currentQuestions
     else:
         # new paragraph added
         storiesId[id] = True
         
         firstQuestion= []
-        firstQuestion.append(createNewQuestion(dataFrameDataSet["question"][i], answerArray, unprocessedStory))
+        firstQuestion.append(createNewQuestion(dataFrameDataSet["question"][i], answerArray, unprocessedStory, IS_TRAINING))
         
+        # in news QA, we have 1 paragraph (but multiple queustions)
+        # in SqUAD, we can have multiple paragraphs, so for consistency
+        # we use a paragraphList with 1 entry here
+        paragraphList= []
         paragraphElement = {}
         paragraphElement["context"] = getStoryPreProcessedContent(unprocessedStory)
         paragraphElement["qas"] = firstQuestion
         paragraphElement["storyId"] = id
+        paragraphList.append(paragraphElement)
 
         dataObject = {}
         dataObject["title"] = id
-        dataObject["paragraphs"] = paragraphElement
+        dataObject["paragraphs"] = paragraphList
         data["data"].append(dataObject)
 
 squadWrapper["data"] = data["data"]
@@ -127,6 +135,6 @@ squadWrapper["version"] = "1.1"
 
 
 # Create new JSON File
-with open('newsQaJSONSquadFormat.json', 'w') as f:
+with open('./output/newsQaJSONSquadFormat_complete.json', 'w') as f:
   json.dump(squadWrapper, f, ensure_ascii=False)
 

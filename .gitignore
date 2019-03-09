@@ -1,9 +1,1 @@
-# ignore input files, since these are too big
-# directory pandas was created for debugging in VS Studio
-
-data/
-pandas/
-output/newsQaJSONSquadFormat_5000.json
-output/newsQaJSONSquadFormat.json
-.DS_Store
-debug/.DS_Store
+**/data/*
