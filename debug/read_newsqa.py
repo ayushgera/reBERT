@@ -94,4 +94,4 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
 
 # NewsQA training dataset
 # read_squad_examples("../output/newsQaJSONSquadFormat.json", True, True)
-read_squad_examples("../output/newsQaJSONSquadFormat_training.json", True, True)
+read_squad_examples("../output/newsQaJSONSquadFormat_complete2.json", True, True)

@@ -9,7 +9,10 @@ filePathDataset = os.path.abspath("./data/newsqa-data-v1/newsqa-data-v1.csv")
 filePathStories = os.path.abspath("./data/")
 REPLACE_WITH_NO_SPACE = \
     regex.compile("(\()|(\,)|(\")|(\))|(\–)|(\;)|(\!)|(\-)|(<br />)|@highlight|(cnn)|(\:)|(\“)|(\’)|(\‘)|(\”)|(\')|(\\n)")
-IS_TRAINING = True
+IS_TRAINING = False
+TOTAL_IMPOSSIBLE_ANSWERS = 0
+TOTAL_MULTIPLE_ANSWERS = 0
+TOTAL_ONE_ANSWER = 0
 
 # Function does first-level data cleaning
 def getStoryPreProcessedContent(storyContent):
@@ -61,16 +64,25 @@ def getStartAnswerCharIndex(ansCharRange):
 
 def createNewQuestion(question, answerArray, unprocessedStory, IS_TRAINING):
     # Building up of objects
+    global TOTAL_IMPOSSIBLE_ANSWERS
+    global TOTAL_MULTIPLE_ANSWERS
+    global TOTAL_ONE_ANSWER
     qaElement= {}
     qaElement["answers"] = getAnswersAsText(answerArray, getEscapedStory(unprocessedStory), IS_TRAINING)
     qaElement["is_impossible"] = len(qaElement["answers"])==0
-    qaElement
+    if len(qaElement["answers"])==0:
+        TOTAL_IMPOSSIBLE_ANSWERS +=1
+    elif len(qaElement["answers"])>1:
+        TOTAL_MULTIPLE_ANSWERS +=1 
+    else:
+        TOTAL_ONE_ANSWER += 1
     qaElement["question"] = question
     qaElement["id"] = id
     return qaElement
 
 # Initializing
 dataFrameDataSet = pd.read_csv(filePathDataset)
+#dataFrameDataSet=dataFrameDataSet[:50]
 dataFrameDataSet.dropna(how="all", inplace=True) 
 
 squadWrapper = {}
@@ -79,6 +91,7 @@ data["data"] = []
 storiesId = {}
 
 # Construction of JSON data
+#len(dataFrameDataSet)
 for i in range(0, len(dataFrameDataSet)):
     # Skip if no answer present
     answerArray = (dataFrameDataSet["answer_char_ranges"][i]).split("|")
@@ -122,7 +135,7 @@ for i in range(0, len(dataFrameDataSet)):
         paragraphElement = {}
         paragraphElement["context"] = getStoryPreProcessedContent(unprocessedStory)
         paragraphElement["qas"] = firstQuestion
-        paragraphElement["storyId"] = id
+        #paragraphElement["storyId"] = id
         paragraphList.append(paragraphElement)
 
         dataObject = {}
@@ -134,7 +147,21 @@ squadWrapper["data"] = data["data"]
 squadWrapper["version"] = "1.1"
 
 
+#counter = 0
+#for x in squadWrapper["data"]:
+#    for xx in x["paragraphs"]:
+#        for qa in xx["qas"]:
+#            if len(qa["answers"]) >1:
+#                counter=counter+1
+#print("Multiple answers==========",counter)
+
+print("#############")
+print("Total impossible answers: ",TOTAL_IMPOSSIBLE_ANSWERS)
+print("Total multiple answers: ",TOTAL_MULTIPLE_ANSWERS)
+print("Total single asnwers: ",TOTAL_ONE_ANSWER)
+print("#############")
+
 # Create new JSON File
-with open('./output/newsQaJSONSquadFormat_complete.json', 'w') as f:
+with open('./output/newsQaJSONSquadFormat_completeFull.json', 'w') as f:
   json.dump(squadWrapper, f, ensure_ascii=False)
 
