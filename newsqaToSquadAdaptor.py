@@ -9,7 +9,7 @@ filePathDataset = os.path.abspath("./data/newsqa-data-v1/newsqa-data-v1.csv")
 filePathStories = os.path.abspath("./data/")
 REPLACE_WITH_NO_SPACE = \
     regex.compile("(\()|(\,)|(\")|(\))|(\–)|(\;)|(\!)|(\-)|(<br />)|@highlight|(cnn)|(\:)|(\“)|(\’)|(\‘)|(\”)|(\')|(\\n)")
-IS_TRAINING = False
+IS_TRAINING = True
 TOTAL_IMPOSSIBLE_ANSWERS = 0
 TOTAL_MULTIPLE_ANSWERS = 0
 TOTAL_ONE_ANSWER = 0
@@ -92,7 +92,7 @@ storiesId = {}
 
 # Construction of JSON data
 #len(dataFrameDataSet)
-for i in range(0, len(dataFrameDataSet)):
+for i in range(0, 7551):
     # Skip if no answer present
     answerArray = (dataFrameDataSet["answer_char_ranges"][i]).split("|")
     answerPresence = isAnswerPresent(answerArray)
@@ -133,7 +133,7 @@ for i in range(0, len(dataFrameDataSet)):
         # we use a paragraphList with 1 entry here
         paragraphList= []
         paragraphElement = {}
-        paragraphElement["context"] = getStoryPreProcessedContent(unprocessedStory)
+        paragraphElement["context"] = unprocessedStory#getStoryPreProcessedContent(unprocessedStory)
         paragraphElement["qas"] = firstQuestion
         #paragraphElement["storyId"] = id
         paragraphList.append(paragraphElement)
@@ -162,6 +162,6 @@ print("Total single asnwers: ",TOTAL_ONE_ANSWER)
 print("#############")
 
 # Create new JSON File
-with open('./output/newsQaJSONSquadFormat_completeFull.json', 'w') as f:
+with open('./output/newsQaJSONSquadFormat_7551_oneAnswer.json', 'w') as f:
   json.dump(squadWrapper, f, ensure_ascii=False)
 
