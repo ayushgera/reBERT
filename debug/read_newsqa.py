@@ -54,8 +54,8 @@ class SquadExample(object):
 def read_squad_examples(input_file, is_training, version_2_with_negative):
 
     #Uncomment to manually validate the generated vs guessed answers
-    word_answers_file = open('./all_word_answers', 'w+')
-    actual_answers_file = open('./all_actual_answers', 'w+')
+    #word_answers_file = open('./all_word_answers', 'w+')
+    #actual_answers_file = open('./all_actual_answers', 'w+')
 
     """Read a SQuAD json file into a list of SquadExample."""
     with open(input_file, "r", encoding='utf-8') as reader:
@@ -111,8 +111,8 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
                         cleaned_answer_text = orig_answer_text # " ".join(whitespace_tokenize(orig_answer_text))
 
                         #To manually validate the generated vs guessed answers
-                        word_answers_file.write(actual_text+"\n")
-                        actual_answers_file.write(cleaned_answer_text+"\n")
+                        #word_answers_file.write(actual_text+"\n")
+                        #actual_answers_file.write(cleaned_answer_text+"\n")
 
                         # Following is not valid for NewsQA, since:
                         # - indexing is a bit off for most questions,
@@ -153,8 +153,8 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
     print ("OK", len(examples))
 
     # Uncomment to manually validate the generated vs guessed answers
-    actual_answers_file.close()
-    word_answers_file.close()
+    #actual_answers_file.close()
+    #word_answers_file.close()
     return examples
 
 # SQuAD training dataset
