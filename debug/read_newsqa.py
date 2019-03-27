@@ -54,8 +54,8 @@ class SquadExample(object):
 def read_squad_examples(input_file, is_training, version_2_with_negative):
 
     #Uncomment to manually validate the generated vs guessed answers
-    #word_answers_file = open('./all_word_answers', 'w+')
-    #actual_answers_file = open('./all_actual_answers', 'w+')
+    clean_word_indexed_answers = open('./clean_word_indexed_answers', 'w+')
+    unclean_char_indexed_answers_from_input = open('./unclean_char_indexed_answers_from_input', 'w+')
 
     """Read a SQuAD json file into a list of SquadExample."""
     with open(input_file, "r", encoding='utf-8') as reader:
@@ -107,12 +107,11 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
                         start_position = char_to_word_offset[answer_offset]
                         end_position = char_to_word_offset[answer_offset + answer_length - 1]
 
-                        actual_text = " ".join(doc_tokens[start_position:(end_position + 1)])
-                        cleaned_answer_text = orig_answer_text # " ".join(whitespace_tokenize(orig_answer_text))
+                        cleaned_word_indexed_text = " ".join(doc_tokens[start_position:(end_position + 1)])
 
                         #To manually validate the generated vs guessed answers
-                        #word_answers_file.write(actual_text+"\n")
-                        #actual_answers_file.write(cleaned_answer_text+"\n")
+                        clean_word_indexed_answers.write(cleaned_word_indexed_text+"\n")
+                        unclean_char_indexed_answers_from_input.write(orig_answer_text+"\n")
 
                         # Following is not valid for NewsQA, since:
                         # - indexing is a bit off for most questions,
@@ -135,7 +134,7 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
                         start_position = -1
                         end_position = -1
                         actual_text = ""
-                        orig_answer_text = ""
+                        cleaned_word_indexed_text = ""
 
                 # we use actual_text instead of orig_answer_text for NewsQA, since the
                 # indexing of character is not perfect.
@@ -145,7 +144,7 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
                     qas_id=qas_id,
                     question_text=question_text,
                     doc_tokens=doc_tokens,
-                    orig_answer_text=actual_text,#orig_answer_text,
+                    orig_answer_text=cleaned_word_indexed_text,
                     start_position=start_position,
                     end_position=end_position,
                     is_impossible=is_impossible)
@@ -153,8 +152,8 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
     print ("OK", len(examples))
 
     # Uncomment to manually validate the generated vs guessed answers
-    #actual_answers_file.close()
-    #word_answers_file.close()
+    unclean_char_indexed_answers_from_input.close()
+    clean_word_indexed_answers.close()
     return examples
 
 # SQuAD training dataset
@@ -162,4 +161,4 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
 
 # NewsQA training dataset
 # read_squad_examples("../output/newsQaJSONSquadFormat.json", True, True)
-read_squad_examples("../output/newsQaJSONSquadFormat_complete_oneanswer.json", True, True)
+read_squad_examples("../output/splitData/<PASS_FILENAME>.json", True, True)
