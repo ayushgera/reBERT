@@ -9,7 +9,7 @@ filePathDataset = os.path.abspath("./data/newsqa-data-v1/newsqa-data-v1.csv")
 filePathStories = os.path.abspath("./data/")
 REPLACE_WITH_NO_SPACE = \
     regex.compile("(\()|(\,)|(\")|(\))|(\–)|(\;)|(\!)|(\-)|(<br />)|@highlight|(cnn)|(\:)|(\“)|(\’)|(\‘)|(\”)|(\')|(\\n)")
-IS_TRAINING = True
+IS_TRAINING = False
 TOTAL_IMPOSSIBLE_ANSWERS = 0
 TOTAL_MULTIPLE_ANSWERS = 0
 TOTAL_ONE_ANSWER = 0
@@ -62,7 +62,7 @@ def getStartAnswerCharIndex(ansCharRange):
     rangeSplit = ansCharRange.split(":")
     return int(rangeSplit[0])
 
-def createNewQuestion(question, answerArray, unprocessedStory, IS_TRAINING):
+def createNewQuestion(question, answerArray, unprocessedStory, IS_TRAINING, q_id):
     # Building up of objects
     global TOTAL_IMPOSSIBLE_ANSWERS
     global TOTAL_MULTIPLE_ANSWERS
@@ -77,7 +77,9 @@ def createNewQuestion(question, answerArray, unprocessedStory, IS_TRAINING):
     else:
         TOTAL_ONE_ANSWER += 1
     qaElement["question"] = question
-    qaElement["id"] = id
+    m = regex.search('./cnn/stories/(.+?).story', id)
+    unique_q_id = m.group(1) if m else id
+    qaElement["id"] = unique_q_id+"_"+str(q_id)
     return qaElement
 
 # Initializing
@@ -92,7 +94,7 @@ storiesId = {}
 
 # Construction of JSON data
 #len(dataFrameDataSet)
-for i in range(0, 7551):
+for i in range(0, len(dataFrameDataSet)):
     # Skip if no answer present
     answerArray = (dataFrameDataSet["answer_char_ranges"][i]).split("|")
     answerPresence = isAnswerPresent(answerArray)
@@ -119,14 +121,14 @@ for i in range(0, 7551):
                     createNewQuestion(
                         dataFrameDataSet["question"][i], 
                         answerArray, 
-                        unprocessedStory, IS_TRAINING))
+                        unprocessedStory, IS_TRAINING, len(currentQuestions)+1))
                 storyElement["paragraphs"][0]["qas"]= currentQuestions
     else:
         # new paragraph added
         storiesId[id] = True
         
         firstQuestion= []
-        firstQuestion.append(createNewQuestion(dataFrameDataSet["question"][i], answerArray, unprocessedStory, IS_TRAINING))
+        firstQuestion.append(createNewQuestion(dataFrameDataSet["question"][i], answerArray, unprocessedStory, IS_TRAINING, 1))
         
         # in news QA, we have 1 paragraph (but multiple queustions)
         # in SqUAD, we can have multiple paragraphs, so for consistency
@@ -162,6 +164,6 @@ print("Total single asnwers: ",TOTAL_ONE_ANSWER)
 print("#############")
 
 # Create new JSON File
-with open('./output/newsQaJSONSquadFormat_7551_oneAnswer.json', 'w') as f:
+with open('./output/newsQaJSONSquadFormat_multipleAnswers_uniqueID.json', 'w') as f:
   json.dump(squadWrapper, f, ensure_ascii=False)
 

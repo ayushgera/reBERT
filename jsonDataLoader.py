@@ -14,8 +14,8 @@ def split_data(training_set_size,
     base_input_path = './output/complete/'
     base_output_path = './output/splitData/'
     
-    training_input_filename = 'newsQaJSONSquadFormat_complete_oneanswer.json'
-    test_input_filename = 'newsQaJSONSquadFormat_complete_multipleAnswers.json'
+    training_input_filename = 'newsQaJSONSquadFormat_oneanswer_uniqueID.json'
+    test_input_filename = 'newsQaJSONSquadFormat_multipleAnswers_uniqueID.json'
     
     training_output_filename = 'training_'+training_set_size+'.json'
     dev_output_filename = 'dev_'+dev_set_size+'.json'
