@@ -4,9 +4,68 @@ nmt based query reformulation
 
 from googletrans import Translator
 import csv
+import os
+from google.cloud import translate_v3beta1 as translate
 
 
-def google_translate_csv(questions, metadata, header, output, src, dst):
+def google_translate_batch(questions, output):
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/peixuan/Downloads/green-chalice-237310-5fa1959eb742.json'
+    client = translate.TranslationServiceClient()
+    project_id = 'green-chalice-237310'
+    location = 'us-central1'
+
+    parent = client.location_path(project_id, location)
+
+    operation = client.batch_translate_text(
+        parent=parent,
+        source_language_code='en',
+        target_language_codes=['zh-CN'])
+
+    result = operation.result(90)
+
+    print('Total Characters: {}'.format(result.total_characters))
+    print('Translated Characters: {}'.format(result.translated_characters))
+
+
+def google_translate(questions, output):
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/peixuan/Downloads/green-chalice-237310-5fa1959eb742.json'
+    client = translate.TranslationServiceClient()
+    project_id = 'green-chalice-237310'
+    location = 'us-central1'
+
+    parent = client.location_path(project_id, location)
+
+    with open(output, 'w') as fout:
+
+        while len(questions) > 0:
+
+            subset_questions = questions[:5]
+            questions = questions[5:]
+
+            cn_response = client.translate_text(
+                parent=parent,
+                contents=subset_questions,
+                source_language_code='en',
+                target_language_code='zh-CN')
+            cn_questions = []
+            for cn_question in cn_response.translations:
+                cn_questions.append(cn_question.translated_text)
+            # print('cn: {}'.format(cn_response.translations[0].translated_text))
+            # print(cn_questions)
+            en_response = client.translate_text(
+                parent=parent,
+                contents=cn_questions,
+                mime_type='text/plain',
+                source_language_code='zh-CN',
+                target_language_code='en'
+            )
+            # print('en: {}'.format(en_response.translations[0].translated_text))
+            for en_question in en_response.translations:
+                # print(en_question.translated_text)
+                fout.write(en_question.translated_text + '\n')
+
+
+def googletrans_csv(questions, metadata, header, output, src, dst):
     print(questions[0:3])
     generated_questions = []
     translator = Translator()
@@ -23,7 +82,7 @@ def google_translate_csv(questions, metadata, header, output, src, dst):
             fout.write(','.join(m) + '\n')
 
 
-def google_translate_text(questions, output, src, dst):
+def googletrans_text(questions, output, src, dst):
     translator = Translator()
     with open(output, 'w') as fout:
         for question in questions:
@@ -54,7 +113,9 @@ def extract_questions_text(txt):
     questions = []
     with open(txt, 'r') as fin:
         for line in fin:
-            questions.append(line.strip())
+            line = line.strip()
+            if 0 < len(line) < 500:
+                questions.append(line.strip())
     return questions
 
 
@@ -62,14 +123,18 @@ def run_csv():
     csv_newsqa = 'newsqa-data-v1.csv'
     csv_output = 'zhcn-newsqa-data-v1.csv'
     questions, metadata, header = extract_questions_csv(csv_newsqa)
-    google_translate_csv(questions, metadata, header, csv_output, 'en', 'zh-CN')
+    googletrans_csv(questions, metadata, header, csv_output, 'en', 'zh-CN')
 
 
 def run_text():
     text_newsqa = 'question_090.txt'
     text_output = 'zhcn-question_090.txt'
     questions = extract_questions_text(text_newsqa)
-    google_translate_text(questions, text_output, 'en', 'zh-CN')
+    num_chars = 0
+    for question in questions:
+        num_chars += len(question)
+    print(num_chars)
+    # google_translate_text(questions, text_output, 'en', 'zh-CN')
 
 
 def clean(questions, metadata):
@@ -86,10 +151,11 @@ def clean(questions, metadata):
 
 
 def main():
-    run_text()
+    # run_text()
     # run_csv()
+    questions = extract_questions_text('from35541_question_090.txt')
+    google_translate(questions, 'zhcn_from35541_question_090.txt')
 
 
 if __name__ == "__main__":
     main()
-
