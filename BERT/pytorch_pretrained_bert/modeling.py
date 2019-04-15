@@ -643,7 +643,7 @@ class BertModel(BertPreTrainedModel):
 
     Inputs:
         `input_ids`: a torch.LongTensor of shape [batch_size, sequence_length]
-            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts
+            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts_log
             `extract_features.py`, `run_classifier.py` and `run_squad.py`)
         `token_type_ids`: an optional torch.LongTensor of shape [batch_size, sequence_length] with the token
             types indices selected in [0, 1]. Type 0 corresponds to a `sentence A` and type 1 corresponds to
@@ -729,7 +729,7 @@ class BertForPreTraining(BertPreTrainedModel):
 
     Inputs:
         `input_ids`: a torch.LongTensor of shape [batch_size, sequence_length]
-            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts
+            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts_log
             `extract_features.py`, `run_classifier.py` and `run_squad.py`)
         `token_type_ids`: an optional torch.LongTensor of shape [batch_size, sequence_length] with the token
             types indices selected in [0, 1]. Type 0 corresponds to a `sentence A` and type 1 corresponds to
@@ -798,7 +798,7 @@ class BertForMaskedLM(BertPreTrainedModel):
 
     Inputs:
         `input_ids`: a torch.LongTensor of shape [batch_size, sequence_length]
-            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts
+            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts_log
             `extract_features.py`, `run_classifier.py` and `run_squad.py`)
         `token_type_ids`: an optional torch.LongTensor of shape [batch_size, sequence_length] with the token
             types indices selected in [0, 1]. Type 0 corresponds to a `sentence A` and type 1 corresponds to
@@ -859,7 +859,7 @@ class BertForNextSentencePrediction(BertPreTrainedModel):
 
     Inputs:
         `input_ids`: a torch.LongTensor of shape [batch_size, sequence_length]
-            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts
+            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts_log
             `extract_features.py`, `run_classifier.py` and `run_squad.py`)
         `token_type_ids`: an optional torch.LongTensor of shape [batch_size, sequence_length] with the token
             types indices selected in [0, 1]. Type 0 corresponds to a `sentence A` and type 1 corresponds to
@@ -923,7 +923,7 @@ class BertForSequenceClassification(BertPreTrainedModel):
 
     Inputs:
         `input_ids`: a torch.LongTensor of shape [batch_size, sequence_length]
-            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts
+            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts_log
             `extract_features.py`, `run_classifier.py` and `run_squad.py`)
         `token_type_ids`: an optional torch.LongTensor of shape [batch_size, sequence_length] with the token
             types indices selected in [0, 1]. Type 0 corresponds to a `sentence A` and type 1 corresponds to
@@ -989,7 +989,7 @@ class BertForMultipleChoice(BertPreTrainedModel):
 
     Inputs:
         `input_ids`: a torch.LongTensor of shape [batch_size, num_choices, sequence_length]
-            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts
+            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts_log
             `extract_features.py`, `run_classifier.py` and `run_squad.py`)
         `token_type_ids`: an optional torch.LongTensor of shape [batch_size, num_choices, sequence_length]
             with the token types indices selected in [0, 1]. Type 0 corresponds to a `sentence A`
@@ -1058,7 +1058,7 @@ class BertForTokenClassification(BertPreTrainedModel):
 
     Inputs:
         `input_ids`: a torch.LongTensor of shape [batch_size, sequence_length]
-            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts
+            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts_log
             `extract_features.py`, `run_classifier.py` and `run_squad.py`)
         `token_type_ids`: an optional torch.LongTensor of shape [batch_size, sequence_length] with the token
             types indices selected in [0, 1]. Type 0 corresponds to a `sentence A` and type 1 corresponds to
@@ -1130,7 +1130,7 @@ class BertForQuestionAnswering(BertPreTrainedModel):
 
     Inputs:
         `input_ids`: a torch.LongTensor of shape [batch_size, sequence_length]
-            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts
+            with the word token indices in the vocabulary(see the tokens preprocessing logic in the scripts_log
             `extract_features.py`, `run_classifier.py` and `run_squad.py`)
         `token_type_ids`: an optional torch.LongTensor of shape [batch_size, sequence_length] with the token
             types indices selected in [0, 1]. Type 0 corresponds to a `sentence A` and type 1 corresponds to

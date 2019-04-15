@@ -5,11 +5,10 @@ import pandas as pd
 import re as regex
 import json
 
-filePathDataset = os.path.abspath("./data/newsQA/newsqa-data-v1/newsqa-data-v1.csv")
-filePathStories = os.path.abspath("./data/")
+filePathDataset = os.path.abspath("./data/newsQA/newsqa-data-v1.csv")
 REPLACE_WITH_NO_SPACE = \
     regex.compile("(\()|(\,)|(\")|(\))|(\–)|(\;)|(\!)|(\-)|(<br />)|@highlight|(cnn)|(\:)|(\“)|(\’)|(\‘)|(\”)|(\')|(\\n)")
-IS_TRAINING = False
+IS_TRAINING = True
 TOTAL_IMPOSSIBLE_ANSWERS = 0
 TOTAL_MULTIPLE_ANSWERS = 0
 TOTAL_ONE_ANSWER = 0
@@ -77,7 +76,7 @@ def createNewQuestion(question, answerArray, unprocessedStory, IS_TRAINING, q_id
     else:
         TOTAL_ONE_ANSWER += 1
     qaElement["question"] = question
-    m = regex.search('./cnn/stories/(.+?).story', id)
+    m = regex.search('./data/newsQA/cnn/stories/(.+?).story', id)
     unique_q_id = m.group(1) if m else id
     qaElement["id"] = unique_q_id+"_"+str(q_id)
     return qaElement
@@ -94,7 +93,7 @@ storiesId = {}
 
 # Construction of JSON data
 #len(dataFrameDataSet)
-for i in range(0, len(dataFrameDataSet)):
+for i in range(0, 1):
     # Skip if no answer present
     answerArray = (dataFrameDataSet["answer_char_ranges"][i]).split("|")
     answerPresence = isAnswerPresent(answerArray)
@@ -155,6 +154,6 @@ print("Total single asnwers: ",TOTAL_ONE_ANSWER)
 print("#############")
 
 # Create new JSON File
-with open('./data/newsQA/generated/complete/newsQaJSONSquadFormat_multipleAnswers.json', 'w') as f:
+with open('./data/newsQA/generated/complete/newsQaJSONSquadFormat_singleAnswers_delete.json', 'w') as f:
   json.dump(squadWrapper, f, ensure_ascii=False)
 
