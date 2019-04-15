@@ -11,7 +11,8 @@ TODO
   - Output files (compressed): JSON files are stored in data/newsQA/validated
 
 **reBERT**:
-  - Run reBERT with following commands:
+  - Run reBERT with following commands:  
+  
   ****Train****  
     python run_reBERT.py --bert_model bert-base-uncased \  
     --do_train \  
