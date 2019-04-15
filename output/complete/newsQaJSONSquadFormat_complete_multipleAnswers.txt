@@ -1,3 +1,0 @@
-Total impossible answers:  9840
-Total multiple answers:  71515
-Total single asnwers:  21487

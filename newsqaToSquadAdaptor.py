@@ -5,7 +5,7 @@ import pandas as pd
 import re as regex
 import json
 
-filePathDataset = os.path.abspath("./data/newsqa-data-v1/newsqa-data-v1.csv")
+filePathDataset = os.path.abspath("./data/newsQA/newsqa-data-v1/newsqa-data-v1.csv")
 filePathStories = os.path.abspath("./data/")
 REPLACE_WITH_NO_SPACE = \
     regex.compile("(\()|(\,)|(\")|(\))|(\–)|(\;)|(\!)|(\-)|(<br />)|@highlight|(cnn)|(\:)|(\“)|(\’)|(\‘)|(\”)|(\')|(\\n)")
@@ -148,15 +148,6 @@ for i in range(0, len(dataFrameDataSet)):
 squadWrapper["data"] = data["data"]
 squadWrapper["version"] = "1.1"
 
-
-#counter = 0
-#for x in squadWrapper["data"]:
-#    for xx in x["paragraphs"]:
-#        for qa in xx["qas"]:
-#            if len(qa["answers"]) >1:
-#                counter=counter+1
-#print("Multiple answers==========",counter)
-
 print("#############")
 print("Total impossible answers: ",TOTAL_IMPOSSIBLE_ANSWERS)
 print("Total multiple answers: ",TOTAL_MULTIPLE_ANSWERS)
@@ -164,6 +155,6 @@ print("Total single asnwers: ",TOTAL_ONE_ANSWER)
 print("#############")
 
 # Create new JSON File
-with open('./output/newsQaJSONSquadFormat_multipleAnswers_uniqueID.json', 'w') as f:
+with open('./data/newsQA/generated/complete/newsQaJSONSquadFormat_multipleAnswers.json', 'w') as f:
   json.dump(squadWrapper, f, ensure_ascii=False)
 

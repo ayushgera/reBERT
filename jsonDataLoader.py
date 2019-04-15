@@ -11,8 +11,8 @@ def split_data(training_set_size,
         dev_set_size,
         test_set_size):
 
-    base_input_path = './output/complete/'
-    base_output_path = './output/splitData/'
+    base_input_path = './data/newsQA/generated/complete'
+    base_output_path = './data/newsQA/generated/splitData'
     
     training_input_filename = 'newsQaJSONSquadFormat_oneanswer_uniqueID.json'
     test_input_filename = 'newsQaJSONSquadFormat_multipleAnswers_uniqueID.json'
