@@ -17,7 +17,7 @@ data = data.values
 data_id = 1
 
 output = {
-	"version": "v1.1",
+	"version": "1.1",
   	"data": []
 }
 
@@ -34,7 +34,7 @@ k = {
 
 story_id_map = {}
 start_pct = 0.9
-end_pct = 0.91
+end_pct = 1.0
 start_read = int(start_pct * len(data))
 end_read = int(end_pct * len(data))
 
@@ -81,34 +81,34 @@ def get_best_possible_ans(possible_ans):
 	return default_ans
 
 for i in range(start_read, end_read):
-	if (isinstance(data[i][k["validated_answers"]], float)): continue
 	
-	possible_ans = {"src1": [], "src2": []}
-	val_ans = json.loads(data[i][k["validated_answers"]])
-	for j in val_ans:
-		splt_validated = j.split(":")
-		if (len(splt_validated) == 1): continue
+	# ALTERNATIVE 1 - USE THIS TO COMPARE answer from crowdsourcer and validators
+	# if (isinstance(data[i][k["validated_answers"]], float)): continue
+	# possible_ans = {"src1": [], "src2": []}
+	# val_ans = json.loads(data[i][k["validated_answers"]])
+	# for j in val_ans:
+	# 	splt_validated = j.split(":")
+	# 	if (len(splt_validated) == 1): continue
 
-		possible_ans["src1"].append(splt_validated)
+	# 	possible_ans["src1"].append(splt_validated)
 
-	if len(possible_ans["src1"]) == 0: continue
+	# if len(possible_ans["src1"]) == 0: continue
 
-	test = data[i][k["answer_char_ranges"]].split("|")
-	for kt in test:
-		test2 = kt.split(",")
-		for ktt in test2:
-			splt_answer = ktt.split(":")
-			if (len(splt_answer) == 1): continue
+	# test = data[i][k["answer_char_ranges"]].split("|")
+	# for kt in test:
+	# 	test2 = kt.split(",")
+	# 	for ktt in test2:
+	# 		splt_answer = ktt.split(":")
+	# 		if (len(splt_answer) == 1): continue
 
-			possible_ans["src2"].append(splt_answer)
+	# 		possible_ans["src2"].append(splt_answer)
 
-	# ALTERNATIVE 1
-	answer_idx = get_best_possible_ans(possible_ans)
+	# answer_idx = get_best_possible_ans(possible_ans)
 
-	# ALTERNATIVE 2
+	# ALTERNATIVE 2 - USE THIS TO GENERATE test.json FROM test.csv
 	# is it possible that the multiple answer matters during prediction?
-	# answer_idxx = data[i][k["answer_char_ranges"]].split("|")[0]
-	# answer_idx = answer_idxx.split(",")[0]
+	answer_idxx = data[i][k["answer_char_ranges"]].split("|")[0]
+	answer_idx = answer_idxx.split(",")[0]
 
 
 	# places = geograpy.get_place_context(text=data[i][k["story_text"]][:100])
