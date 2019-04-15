@@ -1,7 +1,7 @@
 # reBERT
 
 **Introduction**
-TODO
+This project presents reBERT, a novel architecturefor the task of domain-specific question answering(QA) that integrates query reformulation into bidi-rectional encoder representations from transform-ers (BERT) (Devlin et al., 2018). We build on ex-isting research on the NewsQA dataset with fourcontributions: (1) we evaluate the performance ofBERT, (2) attempt transfer learning with the Stan-ford  Question  Answering  Dataset  (SQuAD),  (3)perform data augmentation with SQuAD, and (4)reformulate  queries  using  single  pass  synonym-based  word  replacement  and  multilingual  neu-ral machine translation.   Our results suggest thatBERT alone performs poorly on NewsQA (F1 =25.7). Transfer learning is found to be more usefulwhen  applied  in  conjunction  with  data  augmen-tation,  providing a 26.5 increase inF1from theplain BERT model.  reBERT does not further im-proveF1when transfer learning and data augmen-tation are used.
 
 **read.py**:
   - This reads the NewsQA dataset (consisting of dataset with story IDs, and zipped CNN stories)
