@@ -12,7 +12,7 @@ TODO
 
 **reBERT**:
   - Run reBERT with following commands:
-  ****Train****
+  ****Train****  
     python run_reBERT.py --bert_model bert-base-uncased \  
     --do_train \  
     --do_lower_case \  
@@ -26,12 +26,12 @@ TODO
     --train_batch_size 64 \  
     --output_dir experiment/reBERT  
   
-  ****Predict****
+  ****Predict****  
      python run_reBERT.py --bert_model bert-base-uncased \  
      --do_predict --do_lower_case --predict_file data/newsqa/test.json \  
      --output_dir experiment/reBERT  
 
-   ****Evaluate****
+   ****Evaluate****  
     python evaluate-reBERT.py \  
     data/newsqa/test.json \  
     experiment/reBERT/predictions.json \  
