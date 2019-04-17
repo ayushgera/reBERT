@@ -1,7 +1,7 @@
 # reBERT
 
 **Introduction**  
-This project presents reBERT, a novel architecturefor the task of domain-specific question answering(QA) that integrates query reformulation into bidi-rectional encoder representations from transform-ers (BERT) (Devlin et al., 2018). We build on ex-isting research on the NewsQA dataset with fourcontributions: 
+This project presents reBERT, a novel architecturefor the task of domain-specific question answering(QA) that integrates query reformulation into bidi-rectional encoder representations from transform-ers (BERT) (Devlin et al., 2018). We build on ex-isting research on the NewsQA dataset with fourcontributions:  
 (1) we evaluate the performance ofBERT,  
 (2) attempt transfer learning with the Stan-ford  Question  Answering  Dataset  (SQuAD),  
 (3)perform data augmentation with SQuAD, and  
